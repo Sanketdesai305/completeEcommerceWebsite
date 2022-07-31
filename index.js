@@ -7,6 +7,7 @@ const stripeRoute = require("./routes/stripe")
 const cartRoute = require("./routes/cart");
 const orderRoute = require("./routes/order");
 const bodyParser = require("body-parser");
+import path from 'path';
 const cors = require('cors');
 
 const app = express();
@@ -14,7 +15,7 @@ app.use(cors());
 
 require('dotenv').config();
 
-
+app.use(express.static(path.join(__dirname,'/build')));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
@@ -29,7 +30,11 @@ app.use("/api/carts",cartRoute);
 app.use("/api/orders",orderRoute);
 app.use("/api/checkout", stripeRoute)
 
-app.get('/',(req,res)=>{res.send("APP IS RUNNING!")})
+
+
+app.get('*',(req,res)=>{
+    res.sendFile(path.join(__dirname+'/build/index.html'));
+})
 
 app.listen(process.env.PORT || 5000,()=>{
     console.log(`backend server is running on port ${process.env.PORT||5000}`)
