@@ -7,7 +7,8 @@ const stripeRoute = require("./routes/stripe")
 const cartRoute = require("./routes/cart");
 const orderRoute = require("./routes/order");
 const bodyParser = require("body-parser");
-const path =  require('path');
+const path =  require('\
+path');
 const cors = require('cors');
 
 const app = express();
@@ -15,7 +16,7 @@ app.use(cors());
 
 require('dotenv').config();
 
-app.use(express.static(path.join(__dirname,'/build')));
+app.use(express.static(path.join(__dirname,'build')));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
@@ -33,7 +34,7 @@ app.use("/api/checkout", stripeRoute)
 
 
 app.get('*',(req,res)=>{
-    res.sendFile(path.join(__dirname+'/build/index.html'));
+    res.sendFile(path.join(__dirname+ 'build', 'index.html'));
 })
 
 app.listen(process.env.PORT || 5000,()=>{
