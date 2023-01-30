@@ -3,20 +3,21 @@ import styled from "styled-components";
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
 import Announcements from "../components/Announcements";
-import {Add} from '@material-ui/icons';
+import {Add, Clear} from '@material-ui/icons';
 import {Remove} from '@material-ui/icons';
-import {mobile} from "../responsive";
-import { useSelector } from 'react-redux';
+import {mobile,mobile1,screen1} from "../responsive";
+import { useSelector,useDispatch } from 'react-redux';
 import StripeCheckout from 'react-stripe-checkout';
 import {userRequest} from "../requestMethods";
-import { useNavigate,Link }  from "react-router-dom"
+import { useNavigate,Link }  from "react-router-dom";
+import { clearProduct} from '../redux/cartRedux';
 const KEY = process.env.REACT_APP_STRIPE;
 
 const Container = styled.div``;
 
 const Wrapper = styled.div`
 padding: 20px;
-${mobile({padding:"10px"})}`;
+${mobile({padding:"10px"})};`
 
 const Title = styled.h1`font-weight: 300;text-align:center;`;
 
@@ -29,24 +30,29 @@ color:${props=>props.type === "filled" && "white"};
 `;
 
 const TopTexts = styled.div`
-${mobile({display:"none"})}`;
+${mobile({display:"none"})}
+${mobile1({display:"none"})}`;
 
 const TopText = styled.span`text-decoration:underline; cursor: pointer;margin: 0px 10px;`;
 
 const Bottom = styled.div`display:flex;justify-content:space-between;
-${mobile({flexDirection:"column"})}`;
+${mobile({flexDirection:"column"})}
+${screen1({flexDirection:"column"})}`;
 
 const Info = styled.div`flex:3;`;
 
 const Product = styled.div`
 display:flex;
 justify-content:space-between;
-${mobile({flexDirection:"column"})}`;
+${mobile({flexDirection:"column"})}
+${mobile1({flexDirection:"column"})}`;
 
 const ProductDetails = styled.div`
 flex:2; display: flex;`;
 
-const Image = styled.img`width: 200px;`;
+const Image = styled.img`width: 200px;
+${mobile({width: "100px"})}
+${mobile1({width: "100px"})}`;
 
 const Details = styled.div`padding: 15px;display: flex;flex-direction:column;justify-content:space-between;`;
 
@@ -59,14 +65,19 @@ const ProductColor = styled.div`width: 20px;height: 20px;border-radius:50%;backg
 
 const ProductSize = styled.span``;
 
-const PriceDetails = styled.div`flex:1;display: flex;align-items:center;justify-content: center;flex-direction:column;`;
+const PriceDetails = styled.div`flex:1;display: flex;align-items:center;justify-content: center;flex-direction:column;
+${mobile({marginRight:"250px"})}
+${mobile1({marginRight:"250px"})}`;
 
 const ProductAmountContainer = styled.div`display: flex;align-items:center;margin-bottom:20px;`;
 
 const ProductAmount = styled.div`font-size: 24px;margin: 5px;
-${mobile({margin:"5px 15px"})}`;
+${mobile({margin:"5px 15px", fontSize:"20px"})}
+${mobile1({margin:"5px 15px", fontSize:"20px"})}`;
 
-const ProductPrice = styled.div`font-size: 30px;font-weight: 200;${mobile({marginBottom:"20px"})}`;
+const ProductPrice = styled.div`font-size: 30px;font-weight: 200;
+${mobile({marginBottom:"20px",fontSize:"25px"})}
+${mobile1({marginBottom:"20px",fontSize:"25px"})}`;
 const Hr = styled.hr`
 background-color:#eee; border:none;height: 1px;
 `;
@@ -82,6 +93,9 @@ font-weight:${props=>props.type === "total" && "500"};
 font-size:${props=>props.type === "total" && "24px"};
 `;
 
+const Clearproduct = styled.div` margin-left:200px;margin-bottom:50px;cursor:pointer;
+${mobile({marginBottom:"-30px",marginLeft:"550px"})}
+${mobile1({marginBottom:"-30px",marginLeft:"550px"})}`;
 const SummaryItemPrice = styled.span``;
 
 const SummaryItemText = styled.span``;
@@ -90,9 +104,13 @@ const Button = styled.button`width: 100%;padding: 10px; cursor:pointer;backgroun
 
 
 const Cart = () => {
+    
+    const dispatch = useDispatch();
     const cart = useSelector(state=>state.cart);
     const user = useSelector(state=>state.user.currentUser);
+    // const productQuantity = useSelector(state=>state.productQuantity)
     const [stripeToken,setStripeToken] = useState(null)
+    // const [quantity,setQuantity] = useState(productQuantity);
     const navigate = useNavigate();
     const onToken =(token)=>{
         setStripeToken(token);
@@ -106,16 +124,15 @@ const Cart = () => {
                     amount: cart.total * 100,
                 });
                 navigate("/success",{data:res.data});
-            
-
             }catch{
-
             }
         }
         stripeToken &&  makeRequest();
     },[stripeToken, cart.total,navigate]);
 
-const func =()=>{navigate('/login')}
+    
+
+    const func =()=>{navigate('/login')};
   return (
     <Container>
         <NavBar/>
@@ -156,11 +173,14 @@ const func =()=>{navigate('/login')}
                                 <ProductSize><b>Size:</b>{product.size}</ProductSize>
                             </Details>
                         </ProductDetails>
-                        <PriceDetails>
+                        <PriceDetails>              
+                            <Clearproduct >
+                            <Clear onClick={() => dispatch(clearProduct(product._id))}/>
+                            </Clearproduct>
                             <ProductAmountContainer>
-                                <Add />
-                                <ProductAmount>{product.quantity}</ProductAmount>
                                 <Remove />
+                                <ProductAmount>{product.quantity}</ProductAmount>
+                                <Add />
                             </ProductAmountContainer>
                             <ProductPrice>$ {product.price*product.quantity}</ProductPrice>
                         </PriceDetails>
